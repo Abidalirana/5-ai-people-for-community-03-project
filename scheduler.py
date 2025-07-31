@@ -22,10 +22,13 @@ async def run_and_log(agent_name, run_func):
     except Exception as e:
         logging.error(f"❌ Error in {agent_name}: {e}")
 
-# === Job Scheduling Helper ===
+# === Job Scheduler Helper ===
 def schedule_agent(scheduler, agent_name, run_func, interval_seconds=60):
+    async def job():
+        await run_and_log(agent_name, run_func)
+
     scheduler.add_job(
-        lambda: asyncio.create_task(run_and_log(agent_name, run_func)),
+        job,
         trigger='interval',
         seconds=interval_seconds,
         next_run_time=datetime.now()
@@ -46,7 +49,7 @@ async def main():
 
     try:
         while True:
-            await asyncio.sleep(3600)  # Sleep long; jobs will run independently
+            await asyncio.sleep(3600)  # keep loop alive
     except (KeyboardInterrupt, SystemExit):
         logging.info("🛑 Scheduler stopped.")
 
