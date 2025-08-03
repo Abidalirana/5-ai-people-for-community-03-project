@@ -83,9 +83,10 @@ if __name__ == "__main__":
     asyncio.run(main())
 #=======================
 # Exported function for use in main.py
-async def run_agent():
-    result = await Runner.run(
-        cryptonova,
-        [{"role": "user", "content": "What’s the latest crypto update?"}]
-    )
+#=======================
+# Exported function for use in main.py
+async def run_agent(user_message: str = "What’s the latest crypto update?") -> str:
+    result = await Runner.run(cryptonova, user_message)
     return result.final_output
+#=============================
+#=============================
