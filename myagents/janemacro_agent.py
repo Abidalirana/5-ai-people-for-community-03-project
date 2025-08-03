@@ -2,7 +2,7 @@ import os
 import sys
 import asyncio
 
-# Ensure parent dir is in sys.path
+# === Ensure parent directory is in sys.path for relative imports ===
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
 from dotenv import load_dotenv
@@ -10,26 +10,28 @@ from openai import AsyncOpenAI
 from agents import Agent, Runner, set_tracing_disabled, OpenAIChatCompletionsModel
 from agents import function_tool
 
-# === ENV & Config ===
+# === Load environment variables ===
 load_dotenv()
 set_tracing_disabled(True)
 
+# === Get Gemini API key from environment ===
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise ValueError("❌ GEMINI_API_KEY is missing in .env")
 
-# === Gemini Client ===
+# === Setup Gemini client with AsyncOpenAI ===
 external_client = AsyncOpenAI(
     api_key=GEMINI_API_KEY,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
 )
 
+# === Define the model configuration ===
 model = OpenAIChatCompletionsModel(
     model="gemini-2.0-flash",
     openai_client=external_client
 )
 
-# === Tools ===
+# === Define tools (functions) that agent will use ===
 
 @function_tool
 def fetch_macro_data() -> str:
@@ -61,7 +63,7 @@ def summarize_macro_news() -> str:
 - Fed stays cautious amid stable inflation
 """.strip()
 
-# === Agent Setup ===
+# === Define the JaneMacro agent with tools and instructions ===
 janemacro = Agent(
     name="JaneMacro",
     instructions="""
@@ -78,7 +80,7 @@ Make it concise and actionable for global investors and macro followers.
     model=model
 )
 
-# === Runner ===
+# === Optional: Run directly for testing this agent file ===
 if __name__ == "__main__":
     async def main():
         print("🌍 JaneMacro Agent Running...")
@@ -87,8 +89,13 @@ if __name__ == "__main__":
         print(result.final_output)
 
     asyncio.run(main())
-#=====================
-# Exported for testing in main.py
-async def run_agent():
-    result = await Runner.run(janemacro, [{"role": "user", "content": "Give me a macroeconomic update"}])
+
+# === Exported function to be used in main.py ===
+# === Exported function to be used in main.py ===
+async def run_agent(user_message: str = "Give me a macroeconomic update") -> str:
+    """
+    Run the JaneMacro agent and return the final output.
+    This will be called from main.py or any external script.
+    """
+    result = await Runner.run(janemacro, user_message)
     return result.final_output
