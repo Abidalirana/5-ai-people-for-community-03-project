@@ -74,16 +74,20 @@ Output should resemble a quant research digest with clear metrics.
     model=model
 )
 
-# === Runner ===
+# === Runner (local test) ===
 if __name__ == "__main__":
     async def main():
         print("📊 QuantEdge Agent Running...")
-        result = await Runner.run(quantedge, [{"role": "user", "content": "What's today’s quant signal summary?"}])
+        result = await Runner.run(
+            quantedge,
+            "What's today’s quant signal summary?"
+        )
         print("\n📢 Output:\n")
         print(result.final_output)
 
     asyncio.run(main())
+
 # === Exported function for main.py ===
-async def run_agent():
-    result = await Runner.run(quantedge, [{"role": "user", "content": "What's today’s quant signal summary?"}])
+async def run_agent(user_message: str = "Give me today's market update") -> str:
+    result = await Runner.run(quantedge, user_message)
     return result.final_output
