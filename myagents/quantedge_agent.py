@@ -1,4 +1,4 @@
-# === FILE: myagents/quantedge_agent.py ===
+# === FILE: myagents/quantedge_agent.py ============================================
 import os
 import sys
 import asyncio
@@ -30,7 +30,7 @@ model = OpenAIChatCompletionsModel(
     openai_client=external_client
 )
 
-# === Tools ===
+# === Tools ============================================================================
 
 @function_tool
 def fetch_quantsignal_data() -> str:
